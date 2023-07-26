@@ -31,6 +31,8 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 APP_PORT = int(os.environ.get("WEB_PORT", 8080))
 
+oai_log = logging.getLogger('oai')
+oai_log.setLevel(logging.DEBUG)
 
 class LimitedLengthString:
     def __init__(self, maxlen=2000):
@@ -95,10 +97,11 @@ async def get_code(user_prompt, user_openai_key=None, model="gpt-3.5-turbo"):
     {user_prompt}
     
     Notes: 
-        First, think step by step what you want to do and write it down in English.
+        First, think step by step what you want to do and write it down.
         Then generate valid Python code in a code block 
         Make sure all code is valid - it be run in a Jupyter Python 3 kernel environment. 
         Define every variable before you use it.
+        Please make all the tools you used supporting Unicode.
         For data munging, you can use 
             'numpy', # numpy==1.24.3
             'dateparser' #dateparser==1.1.8
@@ -136,7 +139,7 @@ async def get_code(user_prompt, user_openai_key=None, model="gpt-3.5-turbo"):
             "Content-Type": "application/json",
             "Authorization": f"Bearer {final_openai_key}",
         }
-
+        oai_log.log(logging.INFO, "request openai api:"+json.dumps(data))
         response = requests.post(
             f"{OPENAI_BASE_URL}/v1/chat/completions",
             data=json.dumps(data),
@@ -184,6 +187,7 @@ async def get_code(user_prompt, user_openai_key=None, model="gpt-3.5-turbo"):
         return None, "Error: " + response.text, 500
 
     content = response.json()["choices"][0]["message"]["content"]
+    oai_log.log(logging.INFO, "response from openai api content:"+content)
     return extract_code(content), extract_non_code(content), 200
 
 # We know this Flask app is for local use. So we can disable the verbose Werkzeug logger

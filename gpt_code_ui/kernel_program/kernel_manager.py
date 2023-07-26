@@ -69,6 +69,7 @@ def cleanup_spawned_processes():
 
 def start_snakemq(kc):
     global messaging
+    kc.execute("import os \nprint('kc dir:'+os.getcwd())")
 
     messaging, link = utils.init_snakemq(config.IDENT_KERNEL_MANAGER, "connect")
 
@@ -78,7 +79,9 @@ def start_snakemq(kc):
 
             if message["type"] == "execute":
                 logger.debug("Executing command: %s" % message["value"])
-                kc.execute(message["value"])
+                print("Executing command:"+message["value"])
+                knp = "import os \nprint('kc dir:'+os.getcwd())\n"
+                kc.execute(+message["value"])
                 # Try direct flush with default wait (0.2)
                 flush_kernel_msgs(kc)
 
@@ -181,6 +184,7 @@ def start_kernel():
 
     os.makedirs('workspace/', exist_ok=True)
 
+
     kernel_process = subprocess.Popen(
         [
             sys.executable,
@@ -192,7 +196,9 @@ def start_kernel():
         ],
         cwd='workspace/'
     )
-    # Write PID for caller to kill
+    print("kernel current dir :os.getCwd:"+os.getcwd())
+
+# Write PID for caller to kill
     str_kernel_pid = str(kernel_process.pid)
     os.makedirs(config.KERNEL_PID_DIR, exist_ok=True)
     with open(os.path.join(config.KERNEL_PID_DIR, str_kernel_pid + ".pid"), "w") as p:

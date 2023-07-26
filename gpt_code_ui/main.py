@@ -2,6 +2,7 @@
 
 # webapp is a Flask app (in webapp/main.py relative to this main.py)
 # kernel_program is a Python script (in kernel_program/main.py relative to this main.py)
+import os
 
 import sys
 import logging
@@ -69,6 +70,22 @@ def main():
     setup_logging()
 
     webapp_process = Process(target=run_webapp)
+    # 打印当前目录
+    print("当前目录：", os.getcwd())
+
+    # 改变当前目录
+    # 指定你想要切换到的目录
+    workspace = 'workspace'
+
+    # 判断目录是否存在
+    if os.path.exists(workspace):
+        # 如果存在，则切换到这个目录
+        # os.chdir(workspace)
+        print("已切换到目录：", os.getcwd())
+    else:
+        print("目录不存在：", workspace)
+    # 再次打印当前目录，确认改变已生效
+    print("改变后的目录：", os.getcwd())
     kernel_program_process = Process(target=run_kernel_program)
 
     try:

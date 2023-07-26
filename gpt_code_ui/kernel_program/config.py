@@ -13,6 +13,7 @@ def get_logger():
     )
 
     logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
     if "DEBUG" in os.environ:
         logger.setLevel(logging.DEBUG)
     return logger
